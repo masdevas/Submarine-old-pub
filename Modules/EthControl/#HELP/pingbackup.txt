@@ -1,0 +1,90 @@
+int pingComps(Comp *server, Comp *phot)
+{
+	/* Declaration */
+	byte availServer = COMP_UNDEF, availPhot = COMP_UNDEF;
+	int pipeDescs[2], pid, backupStdout;
+	char pingResponse[PING_RESP_LEN], targetSymb[] = "\045";		//%
+
+	/* Ping computers */
+	while(availServer != COMP_AVAIL && availPhot != COMP_AVAIL)
+	{
+		/* Create pipe for ping server */
+		createPipe(pipeDescs);
+
+		/* Ping server */
+		if( !(pid = fork()) )		// Work in child
+		{
+			/* Redirect stdout */
+			backupStdout = dup(STDOUT_FILENO);		//For nexts printf(no using now)
+			close(STDOUT_FILENO);
+			dup2(pipeDescs[1], STDOUT_FILENO);
+
+			/* Close pipes descriptors */
+			close(pipeDescs[1]);
+			close(pipeDescs[0]);
+
+			execl("/bin/ping", "/bin/ping",  ADDR_SERVER, "-c", "1", "-w", "1", NULL);
+		}else if(pid > 0)		//Work in parent
+		{
+			wait(NULL);
+
+			read(pipeDescs[0], pingResponse, PING_RESP_LEN);
+
+			/* Close pipes descriptors */
+			close(pipeDescs[0]);
+			close(pipeDescs[1]);
+
+			/* Check percent of loss packages */
+			if(getPercPacketLoss(pingResponse, targetSymb) < PERC_LOSS)
+				availServer = COMP_AVAIL;
+			else
+				availServer = COMP_NOT_AVAIL;
+		}else
+		{
+			perror("Process start : Error with start ping server\n");
+			exit(ERROR_SP_WITH_PING_SERVER);
+		}
+
+		/* Repair STDOUT_FILENO(no using now) */
+		dup2(backupStdout, STDOUT_FILENO);
+		close(backupStdout);
+
+		/* Create pipe for ping photographer */
+		createPipe(pipeDescs);
+
+		/* Ping photographer */
+		if( !(pid = fork()) )		// Work in child
+		{
+			/* Redirect stdout */
+			backupStdout = dup(STDOUT_FILENO);		//For nexts printf(no using now)
+			close(STDOUT_FILENO);
+			dup2(pipeDescs[1], STDOUT_FILENO);
+
+			/* Close pipes descriptors */
+			close(pipeDescs[1]);
+			close(pipeDescs[0]);
+			
+			execl("/bin/ping", "/bin/ping",  ADDR_PHOT, "-c", "1", "-w", "1", NULL);
+		}else if(pid > 0)		//Work in parent
+		{
+			wait(NULL);
+			read(pipeDescs[0], pingResponse, PING_RESP_LEN);
+			close(pipeDescs[1]);
+			close(pipeDescs[0]);
+			if(getPercPacketLoss(pingResponse, targetSymb) < PERC_LOSS)
+				availPhot = COMP_AVAIL;
+			else
+				availPhot = COMP_NOT_AVAIL;
+		}else
+		{
+			perror("Process start : Error with start ping photographer\n");
+			exit(ERROR_SP_WITH_PING_PHOT);
+		}
+
+		/* Repair STDOUT_FILENO(no using now) */
+		dup2(backupStdout, STDOUT_FILENO);
+		close(backupStdout);
+	}
+
+	return COMP_AVAIL;
+}

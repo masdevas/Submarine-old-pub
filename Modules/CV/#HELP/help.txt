@@ -1,0 +1,19 @@
+
+With flags bypass
+gcc Code/main.c Code/getCPUTime.c Code/link_areas.c Code/queue_pixel.c Code/data_prepare.c Code/flags_bypass.c Code/cycle_queue_bytes.c -o main.out -lgd -lpng -lz -ljpeg -lfreetype -lm
+
+
+gcc Code/main.c Code/getCPUTime.c Code/link_areas.c Code/queue_pixel.c Code/data_prepare.c -o main.out -lgd -lpng -lz -ljpeg -lfreetype -lm
+
+Test vertexes:
+gcc Code/equivalence_tree.c Code/vertex.c Code/Tests/test_equivalence_tree.c -o testEqTree.out
+
+
+With vertexes:
+gcc Code/main.c Code/getCPUTime.c Code/link_areas.c Code/queue_pixel.c Code/data_prepare.c Code/equivalence_tree.c Code/vertex.c -o main.out -lgd -lpng -lz -ljpeg -lfreetype -lm
+
+
+cd ..
+./#HELP/make_arch.sh 
+gcc -LArchives -lmobsel -lgd -lpng -lz -ljpeg -lfreetype -lm
+

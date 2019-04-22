@@ -1,0 +1,10 @@
+create Archives/libmobsel.a
+addlib Archives/libpromobsel.a
+addlib /usr/lib/x86_64-linux-gnu/libgd.a
+addlib /usr/lib/x86_64-linux-gnu/libpng.a
+addlib /usr/lib/x86_64-linux-gnu/libz.a
+addlib /usr/lib/x86_64-linux-gnu/libjpeg.a
+addlib /usr/lib/x86_64-linux-gnu/libfreetype.a
+addlib /usr/lib/x86_64-linux-gnu/libm.a
+save
+end

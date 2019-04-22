@@ -1,0 +1,8 @@
+#ifndef PHOT_SETTINGS
+#define PHOT_SETTINGS
+
+#define FSWEB_RESP_LEN 1024
+
+#define ERROR_SP_WITH_FSWEBCAM -1
+
+#endif

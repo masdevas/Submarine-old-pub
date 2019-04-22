@@ -1,0 +1,29 @@
+0) Download Submarine
+1) Delete all from /etc/network/inerfaces besides linked with lo
+2) nmcli
+nmcli connection add con-name "static" ifname eth0 autoconnect no type ethernet ip4 192.168.0.51/24 gw4 192.168.0.1
+nmcli connection modify "static" ipv4.dns 192.168.0.1
+nmcli connection up static
+3) ethtool for speed and duplex
+sudo ethtool -s eth0 speed 1000 duplex full autoneg off
+3) Fill /etc/rc.local by 
+	1)nmcli
+	nmcli connection up static
+	2)submarine.out
+
+Logs for ubuntu:
+	1)Insert in /etc/rsyslog.d/50-default.conf :
+	!submarine.out
+	*.* /var/log/submarine.log
+	& ~
+OR BETTER:
+	:programname, contains, "submarine" -/var/log/submarine.log
+	& ~
+
+OR MORE BETTER:
+	1)Create file /etc/rsyslog.D/111submarine.conf
+	2):programname, contains, "submarine" -/var/log/submarine.log
+	& ~
+
+2) /etc/init.d/rsyslog restart
+

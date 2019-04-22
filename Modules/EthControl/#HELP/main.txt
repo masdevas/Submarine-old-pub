@@ -1,0 +1,34 @@
+int main(void)
+{
+	/* Declaration */
+	Host *hosts;
+	char pingResponse[PING_RESP_LEN];
+	byte availServer, availPhot;
+	
+	/* Prepare for working */
+	hosts = (Host*)malloc(sizeof(Host) * 2);
+	initHosts(hosts);
+	pingHosts(hosts, pingResponse);
+	connectHosts(hosts);
+
+	#if defined(THIS_PHOT51) || defined(THIS_PHOT52)
+	while(1)
+	{
+		waitingForServersRequest(hosts);
+		sendData(hosts);
+	}
+	#elif defined(THIS_SERVER)
+	while(1)
+	{
+		sendReadyFlagToPhot(hosts);
+		receiveDataFromPhot(hosts);
+
+		sendReadyFlagToPhot(hosts + 1);
+		receiveDataFromPhot(hosts + 1);
+	}
+	#else
+	#error "Error with working\n"
+	#endif
+
+	return 0;
+}
